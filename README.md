@@ -51,6 +51,29 @@ pip install --user \
 7. **Entrenamiento** — 50 épocas, validación cada 2, sliding-window inference para volumen completo, guarda checkpoint con mínima val loss.
 8. **Visualización 3D** — extracción de superficie (`marching_cubes`) y render PyVista comparativo (GT vs. predicción).
 
+## Revisión Codex
+
+Esta copia agrega `pengwin_pipeline.py` como capa reproducible y revisada del
+pipeline. No reemplaza el notebook original: centraliza utilidades que estaban
+dispersas en celdas y corrige puntos importantes para una defensa prolija:
+
+- descarga segura de imágenes y labels desde el registro esperado de Zenodo;
+- extracción ZIP protegida contra Zip Slip;
+- validación estricta de pares imagen-label antes de hacer el split;
+- transforms centralizados para comparar el modelo con contexto anatómico contra
+  el modelo con foreground sampling;
+- postprocesamiento reusable para remover objetos chicos y conservar la
+  componente principal.
+
+Uso rapido:
+
+```bash
+python pengwin_pipeline.py preprocess
+python pengwin_pipeline.py check-pairs
+```
+
+Ver `CODE_REVIEW.md` para el detalle de hallazgos y recomendaciones de defensa.
+
 ## Decisiones de preprocesamiento
 
 - **Clipping a `[50, 1000] HU`**: el hueso esponjoso/cortical vive ~200–1000 HU; el piso en 50 HU mantiene el borde tejido-blando/hueso. Todo lo fuera de rango se satura.
